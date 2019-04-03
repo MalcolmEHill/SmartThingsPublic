@@ -12,24 +12,26 @@
  *
  */
 metadata {
-	definition (name: "Momentary Capability", namespace: "capabilities", author: "SmartThings") {
+	definition (name: "Simulated Alexa Button", namespace: "bjpierron", author: "bjpierron") {
+		capability "Actuator"
+		capability "Switch"
 		capability "Momentary"
+		capability "Sensor"
+		capability "Contact Sensor"
 	}
 
 	// simulator metadata
 	simulator {
-		// status messages
-		// none
+		status "open": "contact:open"
+		status "closed": "contact:closed"
 
-		// reply messages
-		reply "'on','delay 2000','off'": "switch:off"
 	}
 
 	// UI tile definitions
 	tiles {
 		standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
-			state "off", label: '${name}', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "on"
-			state "on", label: '${name}', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#00A0DC"
+			state "off", label: 'Push', action: "momentary.push", backgroundColor: "#ffffff", nextState: "on"
+			state "on", label: 'Push', action: "momentary.push", backgroundColor: "#53a7c0"
 		}
 		main "switch"
 		details "switch"
@@ -37,14 +39,19 @@ metadata {
 }
 
 def parse(String description) {
-	def pair = description.split(":")
-	createEvent(name: pair[0].trim(), value: pair[1].trim())
 }
 
 def push() {
-	['on','delay 2000','off']
+	sendEvent(name: "switch", value: "on", isStateChange: true, display: false)
+	sendEvent(name: "switch", value: "off", isStateChange: true, display: false)	
+	sendEvent(name: "contact", value: "open", isStateChange: true)	
+	sendEvent(name: "momentary", value: "pushed", isStateChange: true)
+}
+
+def on() {
+	push()
 }
 
 def off() {
-	'off'
+	push()
 }
